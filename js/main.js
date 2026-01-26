@@ -1,19 +1,19 @@
 
 const precioBase = 980000;
-const tiposDeConstruccion = ["Económica", "Estándar", "Premium"];
+const tiposDeConstruccion = ["Economica", "Estandar", "Premium"];
 
 
 function solicitarDatos() {
     let metros = parseInt(prompt("Ingrese los metros cuadrados a construir:"));
     
     while ( metros <= 0) {
-        metros = parseInt(prompt("Ingrese un número válido de metros cuadrados:"));
+        metros = parseInt(prompt("Ingrese un número valido de metros cuadrados:"));
     }
 
     let tipo = prompt(
         "Seleccione el tipo de construcción:\n" +
-        "1 - Económica\n" +
-        "2 - Estándar\n" +
+        "1 - Economica\n" +
+        "2 - Estandar\n" +
         "3 - Premium"
     );
 
@@ -25,9 +25,9 @@ function calcularPresupuesto(metros, tipo) {
     let multiplicador = 1;
 
     while (tipo != "1" && tipo !== "2" && tipo !== "3") {
-        tipo = prompt ("Seleccione el tipo de construcción:\n" +
-        "1 - Económica\n" +
-        "2 - Estándar\n" +
+        tipo = prompt ("Seleccione el tipo de construccion:\n" +
+        "1 - Economica\n" +
+        "2 - Estandar\n" +
         "3 - Premium")
     };
 
@@ -52,7 +52,7 @@ function iniciarPresupuesto() {
         let total = calcularPresupuesto(datos.metros, datos.tipo);
         mostrarResultado(datos.metros, datos.tipo, total);
 
-        continuar = confirm("¿Desea realizar otro cálculo?");
+        continuar = confirm("¿Desea realizar otro calculo?");
     }
 
 }
