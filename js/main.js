@@ -44,6 +44,19 @@ function calcularPresupuesto(metros, tipo) {
 }
 
 
+function iniciarPresupuesto() {
+    let continuar = true;
+
+    while (continuar) {
+        let datos = solicitarDatos();
+        let total = calcularPresupuesto(datos.metros, datos.tipo);
+        mostrarResultado(datos.metros, datos.tipo, total);
+
+        continuar = confirm("¿Desea realizar otro cálculo?");
+    }
+
+}
+
 
 function mostrarResultado(metros, tipo, total) {
     
@@ -58,20 +71,4 @@ function mostrarResultado(metros, tipo, total) {
     console.log("Costo total:", total);
 }
 
-
-
-function iniciarSimulador() {
-    let continuar = true;
-
-    while (continuar) {
-        let datos = solicitarDatos();
-        let total = calcularPresupuesto(datos.metros, datos.tipo);
-        mostrarResultado(datos.metros, datos.tipo, total);
-
-        continuar = confirm("¿Desea realizar otro cálculo?");
-    }
-
-    alert("Gracias por utilizar el simulador.");
-}
-
-iniciarSimulador();
+iniciarPresupuesto();
