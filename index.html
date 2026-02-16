@@ -1,15 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--JS-->
-    <script defer src="./js/main.js"></script>
-    <title>Simulador de presupuestos</title>
+    <title>Simulador de Presupuesto</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>
-        Simulador de presupuestos
-    </h1>
+
+    <h1>Simulador de Presupuesto para Construccion</h1>
+
+    <form id="formPresupuesto">
+        <input type="number" id="metros" placeholder="Metros cuadrados" required min="1">
+
+        <select id="tipo">
+            <option value="1">Economica</option>
+            <option value="2">Estandar</option>
+            <option value="3">Premium</option>
+        </select>
+
+        <button type="submit">Calcular</button>
+    </form>
+
+    <div id="resultado"></div>
+
+    <h2>Historial de presupuestos</h2>
+    <ul id="historial"></ul>
+
+    <p id="totalGeneral"></p>
+
+    <script src="js/main.js"></script>
 </body>
 </html>

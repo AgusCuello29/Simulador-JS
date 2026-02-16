@@ -1,74 +1,103 @@
 
-const precioBase = 980000;
-const tiposDeConstruccion = ["Económica", "Estándar", "Premium"];
+const precioBase = 1015000;
+let presupuestos = JSON.parse(localStorage.getItem("presupuestos")) || [];
 
-
-function solicitarDatos() {
-    let metros = parseInt(prompt("Ingrese los metros cuadrados a construir:"));
-    
-    while ( metros <= 0) {
-        metros = parseInt(prompt("Ingrese un número válido de metros cuadrados:"));
-    }
-
-    let tipo = prompt(
-        "Seleccione el tipo de construcción:\n" +
-        "1 - Económica\n" +
-        "2 - Estandar\n" +
-        "3 - Premium"
-    );
-
-    return { metros, tipo };
-}
 
 
 function calcularPresupuesto(metros, tipo) {
     let multiplicador = 1;
 
-    while (tipo != "1" && tipo !== "2" && tipo !== "3") {
-        tipo = prompt ("Seleccione el tipo de construcción:\n" +
-        "1 - Económica\n" +
-        "2 - Estandar\n" +
-        "3 - Premium")
-    };
-
-    if (tipo === "1") {
-        multiplicador = 1;
-    } else if (tipo === "2") {
-        multiplicador = 1.2;
-    } else if (tipo === "3") {
-        multiplicador = 1.4;
-    } 
-
+    if (tipo === "2") multiplicador = 1.2;
+    if (tipo === "3") multiplicador = 1.4;
 
     return metros * precioBase * multiplicador;
 }
 
+// Objeto
+function crearPresupuesto(metros, tipo, total) {
+    return {
+        id: Date.now(),
+        metros: metros,
+        tipo: tipo,
+        total: total,
+        fecha: new Date().toLocaleString()
+    };
+}
 
-function iniciarPresupuesto() {
-    let continuar = true;
+function obtenerNombreTipo(tipo) {
+    if (tipo === "1") return "Económica";
+    if (tipo === "2") return "Estándar";
+    if (tipo === "3") return "Premium";
+}
 
-    while (continuar) {
-        let datos = solicitarDatos();
-        let total = calcularPresupuesto(datos.metros, datos.tipo);
-        mostrarResultado(datos.metros, datos.tipo, total);
+// Muestra resultado 
+function mostrarResultado(presupuesto) {
+    const divResultado = document.getElementById("resultado");
 
-        continuar = confirm("¿Desea realizar otro cálculo?");
-    }
-
+    divResultado.innerHTML = `
+        <p><strong>Metros:</strong> ${presupuesto.metros} m2</p>
+        <p><strong>Tipo:</strong> ${obtenerNombreTipo(presupuesto.tipo)}</p>
+        <p><strong>Total estimado:</strong> $${presupuesto.total.toLocaleString()}</p>
+    `;
 }
 
 
-function mostrarResultado(metros, tipo, total) {
-    
-    alert(
-        "Presupuesto estimado:\n" +
-        "Metros cuadrados: " + metros + " m2\n" +
-        "Costo total estimado: $" + total
-    );
+function mostrarHistorial() {
+    const lista = document.getElementById("historial");
+    lista.innerHTML = "";
 
-    console.log(" PRESUPUESTO ");
-    console.log("Metros cuadrados:", metros);
-    console.log("Costo total:", total);
+    presupuestos.forEach(p => {
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            ${p.fecha} - ${p.metros}m2 - $${p.total.toLocaleString()}
+            <button onclick="eliminarPresupuesto(${p.id})">Eliminar</button>
+        `;
+
+        lista.appendChild(li);
+    });
+
+    mostrarTotalGeneral();
 }
 
-iniciarPresupuesto();
+
+function mostrarTotalGeneral() {
+    const total = presupuestos.reduce((acumulador, p) => acumulador + p.total, 0);
+
+    document.getElementById("totalGeneral").textContent =
+        "Total acumulado presupuestado: $" + total.toLocaleString();
+}
+
+
+function eliminarPresupuesto(id) {
+    presupuestos = presupuestos.filter(p => p.id !== id);
+
+    localStorage.setItem("presupuestos", JSON.stringify(presupuestos));
+
+    mostrarHistorial();
+}
+
+
+document.getElementById("formPresupuesto").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const metros = parseInt(document.getElementById("metros").value);
+    const tipo = document.getElementById("tipo").value;
+
+    if (metros <= 0) return;
+
+    const total = calcularPresupuesto(metros, tipo);
+
+    const nuevoPresupuesto = crearPresupuesto(metros, tipo, total);
+
+    presupuestos.push(nuevoPresupuesto);
+
+    localStorage.setItem("presupuestos", JSON.stringify(presupuestos));
+
+    mostrarResultado(nuevoPresupuesto);
+    mostrarHistorial();
+
+    this.reset();
+});
+
+mostrarHistorial();
