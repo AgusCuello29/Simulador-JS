@@ -1,11 +1,11 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    background-color: #a3ac8d67;
     padding: 20px;
 }
 
 h1 {
-    color: #333;
+    color: #000000;
 }
 
 form {
@@ -13,15 +13,15 @@ form {
 }
 
 input, select, button {
-    padding: 8px;
+    padding: 20px;
     margin: 5px 0;
 }
 
 button {
-    background-color: #222;
-    color: white;
-    border: none;
-    cursor: pointer;
+    background-color: #22222252;
+    color: rgb(0, 0, 0);
+    border-radius: 10px;
+    
 }
 
 button:hover {
