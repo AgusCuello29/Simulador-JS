@@ -1,0 +1,12 @@
+{
+"tipos": [
+    { "id": "1", "nombre": "Económica", "multiplicador": 1 },
+    { "id": "2", "nombre": "Estándar", "multiplicador": 1.2 },
+    { "id": "3", "nombre": "Premium", "multiplicador": 1.4 }
+],
+"sistemas": [
+    { "nombre": "Tradicional", "factor": 1 },
+    { "nombre": "Steel", "factor": 1.3 },
+    { "nombre": "Combinado", "factor": 1.15 }
+]
+}

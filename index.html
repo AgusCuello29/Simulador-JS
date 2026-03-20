@@ -4,30 +4,44 @@
     <meta charset="UTF-8">
     <title>Simulador de Presupuesto</title>
     <link rel="stylesheet" href="css/style.css">
+
 </head>
 <body>
 
-    <h1>Simulador de Presupuesto para Construccion</h1>
+    <h1>Simular Presupuesto de obra</h1>
 
-    <form id="formPresupuesto">
-        <input type="number" id="metros" placeholder="Metros cuadrados" required min="1">
+    <section> 
+        <form id="formPresupuesto">
+            <input type="number" id="metros" placeholder="Ingrese metros cuadrados" required min="1">
 
-        <select id="tipo">
-            <option value="1">Economica</option>
-            <option value="2">Estandar</option>
-            <option value="3">Premium</option>
-        </select>
+            <select id="tipo">
+                <option value="1">Economica</option>
+                <option value="2">Estandar</option>
+                <option value="3">Premium</option>
+            </select>
+
+            <select name="sistema" id="sistema">
+                <option value="Tradicional"> Tradicional</option>
+                <option value="Steel Frame"> Steel frame</option>
+                <option value="Combinado"> Combinado </option>
+            </select>
 
         <button type="submit">Calcular</button>
-    </form>
+        </form>
+    </section>
 
-    <div id="resultado"></div>
+    <section>
+        <div id="resultado"></div>
+    </section>
 
-    <h2>Historial de presupuestos</h2>
-    <ul id="historial"></ul>
+    <section>
+        <h2>Historial de presupuestos</h2>
+        <ul id="historial"></ul>
+        <p id="totalGeneral"></p>
+    </section>
 
-    <p id="totalGeneral"></p>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/main.js"></script>
+
 </body>
 </html>

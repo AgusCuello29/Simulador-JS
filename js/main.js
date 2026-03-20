@@ -1,103 +1,200 @@
 
-const precioBase = 1015000;
-let presupuestos = JSON.parse(localStorage.getItem("presupuestos")) || [];
+const PRECIO_BASE = 1015000;
 
+let tipos = []
+let sistemas = []
 
+async function cargarDatos() {
+    try {
+        const response = await fetch("data/tipos.json");
+        const data = await response.json();
 
-function calcularPresupuesto(metros, tipo) {
-    let multiplicador = 1;
+        tipos = data.tipos;
+        sistemas = data.sistemas;
 
-    if (tipo === "2") multiplicador = 1.2;
-    if (tipo === "3") multiplicador = 1.4;
-
-    return metros * precioBase * multiplicador;
+    } catch (error) {
+        console.error("Error cargando datos:", error);
+    }
 }
 
-// Objeto
-function crearPresupuesto(metros, tipo, total) {
+let presupuestos = JSON.parse(localStorage.getItem("presupuestos")) || [];
+
+function obtenerMultiplicador(tipoId) {
+    const tipo = tipos.find(t => t.id === tipoId);
+    return tipo ? tipo.multiplicador : 1;
+}
+
+function obtenerNombreTipo(tipoId) {
+    const tipo = tipos.find(t => t.id === tipoId);
+    return tipo ? tipo.nombre : "Desconocido";
+}
+
+function obtenerFactorSistema(nombreSistema) {
+    const sistema = sistemas.find(s => s.nombre === nombreSistema);
+    return sistema ? sistema.factor : 1;
+}
+
+function calcularPresupuesto(metros, tipo, sistema) {
+    const multiplicador = obtenerMultiplicador(tipo);
+    const factorSistema = obtenerFactorSistema(sistema);
+
+    return metros * PRECIO_BASE * multiplicador * factorSistema;
+}
+
+function crearPresupuesto(metros, tipo, sistema, total) {
     return {
         id: Date.now(),
         metros: metros,
         tipo: tipo,
+        sistema: sistema,
         total: total,
         fecha: new Date().toLocaleString()
     };
 }
 
-function obtenerNombreTipo(tipo) {
-    if (tipo === "1") return "Económica";
-    if (tipo === "2") return "Estándar";
-    if (tipo === "3") return "Premium";
+function guardarStorage() {
+    localStorage.setItem("presupuestos", JSON.stringify(presupuestos));
 }
 
-// Muestra resultado 
-function mostrarResultado(presupuesto) {
-    const divResultado = document.getElementById("resultado");
 
-    divResultado.innerHTML = `
-        <p><strong>Metros:</strong> ${presupuesto.metros} m2</p>
-        <p><strong>Tipo:</strong> ${obtenerNombreTipo(presupuesto.tipo)}</p>
-        <p><strong>Total estimado:</strong> $${presupuesto.total.toLocaleString()}</p>
-    `;
+function mostrarResultado(p) {
+    const resultado = document.getElementById("resultado");
+
+    resultado.innerHTML = `
+        <p>Metros: ${p.metros} m²</p>
+        <p>Tipo: ${obtenerNombreTipo(p.tipo)}</p>
+        <p>Sistema: ${p.sistema}</p>
+        <p>Total: $${p.total.toLocaleString()}</p>
+        <button id="btnContratar">Contratar servicio</button>
+    `
+
+    const boton = document.getElementById("btnContratar");
+
+    boton.addEventListener("click", function () {
+        contratarServicio(p.id)
+    });
 }
 
+function contratarServicio(id) {
+    const presupuesto = presupuestos.find(p => p.id === id);
+
+    if (!presupuesto) return;
+
+    presupuesto.contratado = true;
+
+    guardarStorage();
+    mostrarHistorial();
+
+    Swal.fire({
+        icon: "success",
+        title: "Servicio contratado",
+        text: "Nos estaremos contactando con vos"
+    });
+}
 
 function mostrarHistorial() {
     const lista = document.getElementById("historial");
     lista.innerHTML = "";
 
-    presupuestos.forEach(p => {
+
+    if (presupuestos.length === 0) {
+        lista.innerHTML = "<li>No hay presupuestos aún</li>";
+        document.getElementById("totalGeneral").textContent = "";
+        return;
+    }
+
+    for (let i = 0; i < presupuestos.length; i++) {
+        const p = presupuestos[i];
+
         const li = document.createElement("li");
 
-        li.innerHTML = `
-            ${p.fecha} - ${p.metros}m2 - $${p.total.toLocaleString()}
-            <button onclick="eliminarPresupuesto(${p.id})">Eliminar</button>
-        `;
+        const texto = document.createElement("span");
+        texto.textContent = `${p.fecha} - ${p.metros}m² - ${obtenerNombreTipo(p.tipo)} - ${p.sistema} - $${p.total.toLocaleString()}`;
+
+        const boton = document.createElement("button");
+        boton.textContent = "Eliminar";
+
+        boton.addEventListener("click", function () {
+            eliminarPresupuesto(p.id);
+        });
+
+        li.appendChild(texto);
+        li.appendChild(boton);
 
         lista.appendChild(li);
-    });
+    }
 
-    mostrarTotalGeneral();
+    mostrarTotal();
 }
 
+function mostrarTotal() {
+    let total = 0;
 
-function mostrarTotalGeneral() {
-    const total = presupuestos.reduce((acumulador, p) => acumulador + p.total, 0);
+    for (let i = 0; i < presupuestos.length; i++) {
+        total += presupuestos[i].total;
+    }
 
     document.getElementById("totalGeneral").textContent =
-        "Total acumulado presupuestado: $" + total.toLocaleString();
+        "Total acumulado: $" + total.toLocaleString();
 }
-
 
 function eliminarPresupuesto(id) {
-    presupuestos = presupuestos.filter(p => p.id !== id);
 
-    localStorage.setItem("presupuestos", JSON.stringify(presupuestos));
+    Swal.fire({
+        title: "¿Eliminar presupuesto?",
+        text: "Esta acción no se puede deshacer",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Eliminar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
 
-    mostrarHistorial();
+        if (result.isConfirmed) {
+
+            presupuestos = presupuestos.filter(p => p.id !== id);
+
+            guardarStorage();
+            mostrarHistorial();
+
+            Swal.fire({
+                icon: "success",
+                title: "Eliminado",
+                text: "El presupuesto fue eliminado"
+            });
+        }
+    });
 }
 
+const form = document.getElementById("formPresupuesto");
 
-document.getElementById("formPresupuesto").addEventListener("submit", function(e) {
+form.addEventListener("submit", function (e) {
     e.preventDefault();
 
     const metros = parseInt(document.getElementById("metros").value);
     const tipo = document.getElementById("tipo").value;
+    const sistema = document.getElementById("sistema").value;
 
-    if (metros <= 0) return;
+    if (isNaN(metros) || metros <= 0) {
+        return; 
+    }
 
-    const total = calcularPresupuesto(metros, tipo);
+    const total = calcularPresupuesto(metros, tipo, sistema);
 
-    const nuevoPresupuesto = crearPresupuesto(metros, tipo, total);
+    const nuevo = crearPresupuesto(metros, tipo, sistema, total);
 
-    presupuestos.push(nuevoPresupuesto);
+    presupuestos.push(nuevo);
 
-    localStorage.setItem("presupuestos", JSON.stringify(presupuestos));
+    guardarStorage();
 
-    mostrarResultado(nuevoPresupuesto);
+    mostrarResultado(nuevo);
     mostrarHistorial();
 
-    this.reset();
+    form.reset();
 });
 
-mostrarHistorial();
+async function init() {
+    await cargarDatos();
+    mostrarHistorial();
+}
+
+init();
